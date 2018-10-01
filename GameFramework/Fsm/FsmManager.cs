@@ -152,7 +152,7 @@ namespace GameFramework.Fsm
         /// <returns>要获取的有限状态机。</returns>
         public IFsm<T> GetFsm<T>() where T : class
         {
-            return (IFsm<T>)InternelGetFsm(Utility.Text.GetFullName<T>(string.Empty));
+            return (IFsm<T>)InternalGetFsm(Utility.Text.GetFullName<T>(string.Empty));
         }
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace GameFramework.Fsm
                 throw new GameFrameworkException("Owner type is invalid.");
             }
 
-            return InternelGetFsm(Utility.Text.GetFullName(ownerType, string.Empty));
+            return InternalGetFsm(Utility.Text.GetFullName(ownerType, string.Empty));
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace GameFramework.Fsm
         /// <returns>要获取的有限状态机。</returns>
         public IFsm<T> GetFsm<T>(string name) where T : class
         {
-            return (IFsm<T>)InternelGetFsm(Utility.Text.GetFullName<T>(name));
+            return (IFsm<T>)InternalGetFsm(Utility.Text.GetFullName<T>(name));
         }
 
         /// <summary>
@@ -194,7 +194,7 @@ namespace GameFramework.Fsm
                 throw new GameFrameworkException("Owner type is invalid.");
             }
 
-            return InternelGetFsm(Utility.Text.GetFullName(ownerType, name));
+            return InternalGetFsm(Utility.Text.GetFullName(ownerType, name));
         }
 
         /// <summary>
@@ -204,13 +204,31 @@ namespace GameFramework.Fsm
         public FsmBase[] GetAllFsms()
         {
             int index = 0;
-            FsmBase[] fsms = new FsmBase[m_Fsms.Count];
+            FsmBase[] results = new FsmBase[m_Fsms.Count];
             foreach (KeyValuePair<string, FsmBase> fsm in m_Fsms)
             {
-                fsms[index++] = fsm.Value;
+                results[index++] = fsm.Value;
             }
 
-            return fsms;
+            return results;
+        }
+
+        /// <summary>
+        /// 获取所有有限状态机。
+        /// </summary>
+        /// <param name="results">所有有限状态机。</param>
+        public void GetAllFsms(List<FsmBase> results)
+        {
+            if (results == null)
+            {
+                throw new GameFrameworkException("Results is invalid.");
+            }
+
+            results.Clear();
+            foreach (KeyValuePair<string, FsmBase> fsm in m_Fsms)
+            {
+                results.Add(fsm.Value);
+            }
         }
 
         /// <summary>
@@ -237,7 +255,7 @@ namespace GameFramework.Fsm
         {
             if (HasFsm<T>(name))
             {
-                throw new GameFrameworkException(string.Format("Already exist FSM '{0}'.", Utility.Text.GetFullName<T>(name)));
+                throw new GameFrameworkException(Utility.Text.Format("Already exist FSM '{0}'.", Utility.Text.GetFullName<T>(name)));
             }
 
             Fsm<T> fsm = new Fsm<T>(name, owner, states);
@@ -333,7 +351,7 @@ namespace GameFramework.Fsm
             return m_Fsms.ContainsKey(fullName);
         }
 
-        private FsmBase InternelGetFsm(string fullName)
+        private FsmBase InternalGetFsm(string fullName)
         {
             FsmBase fsm = null;
             if (m_Fsms.TryGetValue(fullName, out fsm))

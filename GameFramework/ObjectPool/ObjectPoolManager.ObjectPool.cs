@@ -31,15 +31,16 @@ namespace GameFramework.ObjectPool
             /// </summary>
             /// <param name="name">对象池名称。</param>
             /// <param name="allowMultiSpawn">是否允许对象被多次获取。</param>
+            /// <param name="autoReleaseInterval">对象池自动释放可释放对象的间隔秒数。</param>
             /// <param name="capacity">对象池的容量。</param>
             /// <param name="expireTime">对象池对象过期秒数。</param>
             /// <param name="priority">对象池的优先级。</param>
-            public ObjectPool(string name, bool allowMultiSpawn, int capacity, float expireTime, int priority)
+            public ObjectPool(string name, bool allowMultiSpawn, float autoReleaseInterval, int capacity, float expireTime, int priority)
                 : base(name)
             {
                 m_Objects = new LinkedList<Object<T>>();
                 m_AllowMultiSpawn = allowMultiSpawn;
-                m_AutoReleaseInterval = expireTime;
+                m_AutoReleaseInterval = autoReleaseInterval;
                 Capacity = capacity;
                 ExpireTime = expireTime;
                 m_Priority = priority;
@@ -126,7 +127,7 @@ namespace GameFramework.ObjectPool
                         return;
                     }
 
-                    Log.Debug("Object pool '{0}' capacity changed from '{1}' to '{2}'.", Utility.Text.GetFullName<T>(Name), m_Capacity.ToString(), value.ToString());
+                    GameFrameworkLog.Debug("Object pool '{0}' capacity changed from '{1}' to '{2}'.", Utility.Text.GetFullName<T>(Name), m_Capacity.ToString(), value.ToString());
                     m_Capacity = value;
                     Release();
                 }
@@ -154,7 +155,7 @@ namespace GameFramework.ObjectPool
                         return;
                     }
 
-                    Log.Debug("Object pool '{0}' expire time changed from '{1}' to '{2}'.", Utility.Text.GetFullName<T>(Name), m_ExpireTime.ToString(), value.ToString());
+                    GameFrameworkLog.Debug("Object pool '{0}' expire time changed from '{1}' to '{2}'.", Utility.Text.GetFullName<T>(Name), m_ExpireTime.ToString(), value.ToString());
                     m_ExpireTime = value;
                     Release();
                 }
@@ -187,7 +188,7 @@ namespace GameFramework.ObjectPool
                     throw new GameFrameworkException("Object is invalid.");
                 }
 
-                Log.Debug(spawned ? "Object pool '{0}' create and spawned '{1}'." : "Object pool '{0}' create '{1}'.", Utility.Text.GetFullName<T>(Name), obj.Name);
+                GameFrameworkLog.Debug(spawned ? "Object pool '{0}' create and spawned '{1}'." : "Object pool '{0}' create '{1}'.", Utility.Text.GetFullName<T>(Name), obj.Name);
                 m_Objects.AddLast(new Object<T>(obj, spawned));
 
                 Release();
@@ -250,7 +251,7 @@ namespace GameFramework.ObjectPool
 
                     if (m_AllowMultiSpawn || !obj.IsInUse)
                     {
-                        Log.Debug("Object pool '{0}' spawn '{1}'.", Utility.Text.GetFullName<T>(Name), obj.Peek().Name);
+                        GameFrameworkLog.Debug("Object pool '{0}' spawn '{1}'.", Utility.Text.GetFullName<T>(Name), obj.Peek().Name);
                         return obj.Spawn();
                     }
                 }
@@ -287,14 +288,14 @@ namespace GameFramework.ObjectPool
                 {
                     if (obj.Peek().Target == target)
                     {
-                        Log.Debug("Object pool '{0}' unspawn '{1}'.", Utility.Text.GetFullName<T>(Name), obj.Peek().Name);
+                        GameFrameworkLog.Debug("Object pool '{0}' unspawn '{1}'.", Utility.Text.GetFullName<T>(Name), obj.Peek().Name);
                         obj.Unspawn();
                         Release();
                         return;
                     }
                 }
 
-                throw new GameFrameworkException(string.Format("Can not find target in object pool '{0}'.", Utility.Text.GetFullName<T>(Name)));
+                throw new GameFrameworkException(Utility.Text.Format("Can not find target in object pool '{0}'.", Utility.Text.GetFullName<T>(Name)));
             }
 
             /// <summary>
@@ -328,13 +329,13 @@ namespace GameFramework.ObjectPool
                 {
                     if (obj.Peek().Target == target)
                     {
-                        Log.Debug("Object pool '{0}' set locked '{1}' to '{2}.", Utility.Text.GetFullName<T>(Name), obj.Peek().Name, locked.ToString());
+                        GameFrameworkLog.Debug("Object pool '{0}' set locked '{1}' to '{2}.", Utility.Text.GetFullName<T>(Name), obj.Peek().Name, locked.ToString());
                         obj.Locked = locked;
                         return;
                     }
                 }
 
-                throw new GameFrameworkException(string.Format("Can not find target in object pool '{0}'.", Utility.Text.GetFullName<T>(Name)));
+                throw new GameFrameworkException(Utility.Text.Format("Can not find target in object pool '{0}'.", Utility.Text.GetFullName<T>(Name)));
             }
 
             /// <summary>
@@ -368,13 +369,13 @@ namespace GameFramework.ObjectPool
                 {
                     if (obj.Peek().Target == target)
                     {
-                        Log.Debug("Object pool '{0}' set priority '{1}' to '{2}.", Utility.Text.GetFullName<T>(Name), obj.Peek().Name, priority.ToString());
+                        GameFrameworkLog.Debug("Object pool '{0}' set priority '{1}' to '{2}.", Utility.Text.GetFullName<T>(Name), obj.Peek().Name, priority.ToString());
                         obj.Priority = priority;
                         return;
                     }
                 }
 
-                throw new GameFrameworkException(string.Format("Can not find target in object pool '{0}'.", Utility.Text.GetFullName<T>(Name)));
+                throw new GameFrameworkException(Utility.Text.Format("Can not find target in object pool '{0}'.", Utility.Text.GetFullName<T>(Name)));
             }
 
             /// <summary>
@@ -451,7 +452,7 @@ namespace GameFramework.ObjectPool
 
                         m_Objects.Remove(obj);
                         obj.Release(false);
-                        Log.Debug("Object pool '{0}' release '{1}'.", Utility.Text.GetFullName<T>(Name), toReleaseObject.Name);
+                        GameFrameworkLog.Debug("Object pool '{0}' release '{1}'.", Utility.Text.GetFullName<T>(Name), toReleaseObject.Name);
                         found = true;
                         break;
                     }
@@ -480,7 +481,7 @@ namespace GameFramework.ObjectPool
                     LinkedListNode<Object<T>> next = current.Next;
                     m_Objects.Remove(current);
                     current.Value.Release(false);
-                    Log.Debug("Object pool '{0}' release '{1}'.", Utility.Text.GetFullName<T>(Name), current.Value.Name);
+                    GameFrameworkLog.Debug("Object pool '{0}' release '{1}'.", Utility.Text.GetFullName<T>(Name), current.Value.Name);
                     current = next;
                 }
             }
@@ -492,13 +493,13 @@ namespace GameFramework.ObjectPool
             public override ObjectInfo[] GetAllObjectInfos()
             {
                 int index = 0;
-                ObjectInfo[] objectInfos = new ObjectInfo[m_Objects.Count];
+                ObjectInfo[] results = new ObjectInfo[m_Objects.Count];
                 foreach (Object<T> obj in m_Objects)
                 {
-                    objectInfos[index++] = new ObjectInfo(obj.Name, obj.Locked, obj.Priority, obj.LastUseTime, obj.SpawnCount);
+                    results[index++] = new ObjectInfo(obj.Name, obj.Locked, obj.Priority, obj.LastUseTime, obj.SpawnCount);
                 }
 
-                return objectInfos;
+                return results;
             }
 
             internal override void Update(float elapseSeconds, float realElapseSeconds)
@@ -509,9 +510,9 @@ namespace GameFramework.ObjectPool
                     return;
                 }
 
-                Log.Debug("Object pool '{0}' auto release start.", Utility.Text.GetFullName<T>(Name));
+                GameFrameworkLog.Debug("Object pool '{0}' auto release start.", Utility.Text.GetFullName<T>(Name));
                 Release();
-                Log.Debug("Object pool '{0}' auto release complete.", Utility.Text.GetFullName<T>(Name));
+                GameFrameworkLog.Debug("Object pool '{0}' auto release complete.", Utility.Text.GetFullName<T>(Name));
             }
 
             internal override void Shutdown()
@@ -522,7 +523,7 @@ namespace GameFramework.ObjectPool
                     LinkedListNode<Object<T>> next = current.Next;
                     m_Objects.Remove(current);
                     current.Value.Release(true);
-                    Log.Debug("Object pool '{0}' release '{1}'.", Utility.Text.GetFullName<T>(Name), current.Value.Name);
+                    GameFrameworkLog.Debug("Object pool '{0}' release '{1}'.", Utility.Text.GetFullName<T>(Name), current.Value.Name);
                     current = next;
                 }
             }

@@ -59,7 +59,7 @@ namespace GameFramework.DataNode
             {
                 get
                 {
-                    return m_Parent == null ? m_Name : string.Format("{0}{1}{2}", m_Parent.FullName, PathSplit[0], m_Name);
+                    return m_Parent == null ? m_Name : Utility.Text.Format("{0}{1}{2}", m_Parent.FullName, PathSplit[0], m_Name);
                 }
             }
 
@@ -201,6 +201,29 @@ namespace GameFramework.DataNode
             }
 
             /// <summary>
+            /// 获取所有子数据结点。
+            /// </summary>
+            /// <param name="results">所有子数据结点。</param>
+            public void GetAllChild(List<IDataNode> results)
+            {
+                if (results == null)
+                {
+                    throw new GameFrameworkException("Results is invalid.");
+                }
+
+                results.Clear();
+                if (m_Childs == null)
+                {
+                    return;
+                }
+
+                foreach (DataNode child in m_Childs)
+                {
+                    results.Add(child);
+                }
+            }
+
+            /// <summary>
             /// 根据索引移除子数据结点。
             /// </summary>
             /// <param name="index">子数据结点的索引位置。</param>
@@ -255,7 +278,7 @@ namespace GameFramework.DataNode
             /// <returns>数据结点字符串。</returns>
             public override string ToString()
             {
-                return string.Format("{0}: {1}", FullName, ToDataString());
+                return Utility.Text.Format("{0}: {1}", FullName, ToDataString());
             }
 
             /// <summary>
@@ -269,7 +292,7 @@ namespace GameFramework.DataNode
                     return "<Null>";
                 }
 
-                return string.Format("[{0}] {1}", m_Data.Type.Name, m_Data.ToString());
+                return Utility.Text.Format("[{0}] {1}", m_Data.Type.Name, m_Data.ToString());
             }
 
             /// <summary>

@@ -7,19 +7,28 @@
 
 namespace GameFramework
 {
-    public static partial class Log
+    public static partial class Version
     {
         /// <summary>
-        /// 日志辅助器接口。
+        /// 版本号辅助器接口。
         /// </summary>
-        public interface ILogHelper
+        public interface IVersionHelper
         {
             /// <summary>
-            /// 记录日志。
+            /// 获取游戏版本号。
             /// </summary>
-            /// <param name="level">日志等级。</param>
-            /// <param name="message">日志内容。</param>
-            void Log(LogLevel level, object message);
+            string GameVersion
+            {
+                get;
+            }
+
+            /// <summary>
+            /// 获取内部游戏版本号。
+            /// </summary>
+            int InternalGameVersion
+            {
+                get;
+            }
         }
     }
 }

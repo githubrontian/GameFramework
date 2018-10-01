@@ -96,31 +96,59 @@ namespace GameFramework.DataTable
         T GetDataRow(Predicate<T> condition);
 
         /// <summary>
+        /// 获取符合条件的数据表行。
+        /// </summary>
+        /// <param name="condition">要检查的条件。</param>
+        /// <returns>符合条件的数据表行。</returns>
+        T[] GetDataRows(Predicate<T> condition);
+
+        /// <summary>
+        /// 获取符合条件的数据表行。
+        /// </summary>
+        /// <param name="condition">要检查的条件。</param>
+        /// <param name="results">符合条件的数据表行。</param>
+        void GetDataRows(Predicate<T> condition, List<T> results);
+
+        /// <summary>
+        /// 获取排序后的数据表行。
+        /// </summary>
+        /// <param name="comparison">要排序的条件。</param>
+        /// <returns>排序后的数据表行。</returns>
+        T[] GetDataRows(Comparison<T> comparison);
+
+        /// <summary>
+        /// 获取排序后的数据表行。
+        /// </summary>
+        /// <param name="comparison">要排序的条件。</param>
+        /// <param name="results">排序后的数据表行。</param>
+        void GetDataRows(Comparison<T> comparison, List<T> results);
+
+        /// <summary>
+        /// 获取排序后的符合条件的数据表行。
+        /// </summary>
+        /// <param name="condition">要检查的条件。</param>
+        /// <param name="comparison">要排序的条件。</param>
+        /// <returns>排序后的符合条件的数据表行。</returns>
+        T[] GetDataRows(Predicate<T> condition, Comparison<T> comparison);
+
+        /// <summary>
+        /// 获取排序后的符合条件的数据表行。
+        /// </summary>
+        /// <param name="condition">要检查的条件。</param>
+        /// <param name="comparison">要排序的条件。</param>
+        /// <param name="results">排序后的符合条件的数据表行。</param>
+        void GetDataRows(Predicate<T> condition, Comparison<T> comparison, List<T> results);
+
+        /// <summary>
         /// 获取所有数据表行。
         /// </summary>
         /// <returns>所有数据表行。</returns>
         T[] GetAllDataRows();
 
         /// <summary>
-        /// 获取所有符合条件的数据表行。
+        /// 获取所有数据表行。
         /// </summary>
-        /// <param name="condition">要检查的条件。</param>
-        /// <returns>所有符合条件的数据表行。</returns>
-        T[] GetAllDataRows(Predicate<T> condition);
-
-        /// <summary>
-        /// 获取所有排序后的数据表行。
-        /// </summary>
-        /// <param name="comparison">要排序的条件。</param>
-        /// <returns>所有排序后的数据表行。</returns>
-        T[] GetAllDataRows(Comparison<T> comparison);
-
-        /// <summary>
-        /// 获取所有排序后的符合条件的数据表行。
-        /// </summary>
-        /// <param name="condition">要检查的条件。</param>
-        /// <param name="comparison">要排序的条件。</param>
-        /// <returns>所有排序后的符合条件的数据表行。</returns>
-        T[] GetAllDataRows(Predicate<T> condition, Comparison<T> comparison);
+        /// <param name="results">所有数据表行。</param>
+        void GetAllDataRows(List<T> results);
     }
 }

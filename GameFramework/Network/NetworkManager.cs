@@ -188,13 +188,31 @@ namespace GameFramework.Network
         public INetworkChannel[] GetAllNetworkChannels()
         {
             int index = 0;
-            INetworkChannel[] networkChannels = new INetworkChannel[m_NetworkChannels.Count];
+            INetworkChannel[] results = new INetworkChannel[m_NetworkChannels.Count];
             foreach (KeyValuePair<string, NetworkChannel> networkChannel in m_NetworkChannels)
             {
-                networkChannels[index++] = networkChannel.Value;
+                results[index++] = networkChannel.Value;
             }
 
-            return networkChannels;
+            return results;
+        }
+
+        /// <summary>
+        /// 获取所有网络频道。
+        /// </summary>
+        /// <param name="results">所有网络频道。</param>
+        public void GetAllNetworkChannels(List<INetworkChannel> results)
+        {
+            if (results == null)
+            {
+                throw new GameFrameworkException("Results is invalid.");
+            }
+
+            results.Clear();
+            foreach (KeyValuePair<string, NetworkChannel> networkChannel in m_NetworkChannels)
+            {
+                results.Add(networkChannel.Value);
+            }
         }
 
         /// <summary>
@@ -217,7 +235,7 @@ namespace GameFramework.Network
 
             if (HasNetworkChannel(name))
             {
-                throw new GameFrameworkException(string.Format("Already exist network channel '{0}'.", name ?? string.Empty));
+                throw new GameFrameworkException(Utility.Text.Format("Already exist network channel '{0}'.", name ?? string.Empty));
             }
 
             NetworkChannel networkChannel = new NetworkChannel(name, networkChannelHelper);
